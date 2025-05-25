@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aldi Herawan | AgriTech Developer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        .skill-bar {
+            height: 10px;
+            border-radius: 5px;
+            background: linear-gradient(90deg, #4ade80, #3b82f6);
+        }
+        
+        .leaf {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234ade80"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.92-2.43c.41.37.82.75 1.24 1.08.16.13.33.26.5.37.25.16.5.29.76.39.26.1.54.16.83.19.29.03.58.02.88-.04.3-.06.6-.17.9-.32.29-.15.56-.35.82-.58.25-.23.5-.5.71-.82.22-.32.38-.68.5-1.06.13-.38.19-.78.15-1.18-.02-.4-.11-.8-.29-1.17-.17-.38-.43-.72-.75-1.01C12.16 15.26 8.35 15 6.69 13.28c.84-3.44 3.17-6.14 5.13-7.79C13.1 4.82 14 4.15 14.56 3.5c.56-.65.95-1.4 1.22-2.08.45 1.23.62 2.5.65 3.41.04.91-.02 1.8-.22 2.65z"/></svg>');
+            background-size: contain;
+            opacity: 0.7;
+            animation: float 5s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        
+        .farm-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .farm-icon:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        #contactForm input, #contactForm textarea {
+            transition: all 0.3s ease;
+        }
+        
+        #contactForm input:focus, #contactForm textarea:focus {
+            box-shadow: 0 0 0 2px #4ade80;
+        }
+        
+        .glow {
+            box-shadow: 0 0 15px rgba(74, 222, 128, 0.5);
+        }
+        
+        .card-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+        }
+        
+        .card-3d:hover {
+            transform: rotateY(10deg) rotateX(5deg);
+        }
+        
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+        
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .floating {
+            animation: floating 6s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        /* Laravel specific styling */
+        .laravel-badge {
+            background: linear-gradient(to right, #FF2D20, #FF7B25);
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <!-- Background Animation -->
+    <div id="vanta-bg"></div>
+    
+    <!-- Floating Leaves -->
+    <div id="leaves-container"></div>
+    
+    <!-- Navigation -->
+    <nav class="relative z-50 py-4 px-6 bg-gray-900 bg-opacity-80 backdrop-blur-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_2glqweqs.json" background="transparent" speed="1" style="width: 40px; height: 40px" loop autoplay></lottie-player>
+                <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">Aldi Herawan</span>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#about" class="hover:text-green-400 transition">About</a>
+                <a href="#skills" class="hover:text-green-400 transition">Skills</a>
+                <a href="#vision" class="hover:text-green-400 transition">Vision</a>
+                <a href="#contact" class="hover:text-green-400 transition">Contact</a>
+            </div>
+            <button class="md:hidden text-2xl" id="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="md:hidden hidden bg-gray-800 mt-2 rounded-lg p-4" id="mobile-menu">
+            <div class="flex flex-col space-y-3">
+                <a href="#about" class="hover:text-green-400 transition">About</a>
+                <a href="#skills" class="hover:text-green-400 transition">Skills</a>
+                <a href="#vision" class="hover:text-green-400 transition">Vision</a>
+                <a href="#contact" class="hover:text-green-400 transition">Contact</a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <div class="content-wrapper container mx-auto px-6 py-20 text-center">
+            <div class="max-w-3xl mx-auto">
+                <div class="floating inline-block mb-8">
+                    <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_2glqweqs.json" background="transparent" speed="1" style="width: 120px; height: 120px" loop autoplay></lottie-player>
+                </div>
+                <h1 class="text-4xl md:text-6xl font-bold mb-6">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">AgriTech</span> 
+                    <span class="block">Developer</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                    Bridging agriculture and technology through modern web development and cybersecurity.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="#contact" class="px-8 py-3 bg-gradient-to-r from-green-500 to-blue-600 rounded-full font-semibold hover:opacity-90 transition transform hover:scale-105">
+                        Get In Touch
+                    </a>
+                    <a href="#about" class="px-8 py-3 border border-green-400 text-green-400 rounded-full font-semibold hover:bg-green-400 hover:bg-opacity-10 transition transform hover:scale-105">
+                        Learn More
+                    </a>
+                </div>
+            </div>
+            
+            <div class="absolute bottom-10 left-0 right-0 flex justify-center">
+                <a href="#about" class="animate-bounce">
+                    <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- About Section -->
+    <section id="about" class="py-20 relative">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">About Me</span>
+                </h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-green-400 to-blue-500 mx-auto"></div>
+            </div>
+            
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="lg:w-1/2 relative">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Profile" class="rounded-xl w-full max-w-md mx-auto glow">
+                        <div class="absolute -bottom-5 -right-5 bg-gray-800 p-4 rounded-xl shadow-lg">
+                            <lottie-player src="https://assets9.lottiefiles.com/packages/lf20_5tkzkblw.json" background="transparent" speed="1" style="width: 80px; height: 80px" loop autoplay></lottie-player>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:w-1/2">
+                    <h3 class="text-2xl font-bold mb-4">Halo, saya <span class="text-green-400">Aldi Herawan</span></h3>
+                    <p class="text-gray-300 mb-6">
+                        Seorang digital enthusiast yang berfokus pada pengembangan teknologi web, antarmuka interaktif, dan keamanan siber. Saya memiliki dasar pemahaman dalam agribisnis modern, yang menginspirasi saya untuk menjembatani dunia pertanian dan teknologi dengan pendekatan yang lebih efisien dan terotomatisasi.
+                    </p>
+                    <p class="text-gray-300 mb-6">
+                        Dengan kombinasi minat pada dunia kreatif, keterampilan teknis, dan kepekaan terhadap solusi masa depan, saya sedang membentuk jalur karier yang unik di persimpangan antara front-end development, AI assistant systems, dan white hat cybersecurity.
+                    </p>
+                    <p class="text-gray-300">
+                        Saya percaya bahwa teknologi seharusnya bukan hanya inovatif, tetapi juga inklusif dan solutif. Maka dari itu, setiap proyek yang saya kerjakan bertujuan menghadirkan nilai—bukan sekadar tampilan.
+                    </p>
+                    
+                    <div class="mt-8 grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div class="bg-gray-800 bg-opacity-50 p-4 rounded-lg text-center farm-icon">
+                            <i class="fas fa-laptop-code text-3xl text-green-400 mb-2"></i>
+                            <p class="font-medium">Web Development</p>
+                        </div>
+                        <div class="bg-gray-800 bg-opacity-50 p-4 rounded-lg text-center farm-icon">
+                            <i class="fas fa-shield-alt text-3xl text-blue-400 mb-2"></i>
+                            <p class="font-medium">Cybersecurity</p>
+                        </div>
+                        <div class="bg-gray-800 bg-opacity-50 p-4 rounded-lg text-center farm-icon">
+                            <i class="fas fa-leaf text-3xl text-green-500 mb-2"></i>
+                            <p class="font-medium">AgriTech</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Skills Section -->
+    <section id="skills" class="py-20 bg-gray-800 bg-opacity-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">Skills & Expertise</span>
+                </h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-green-400 to-blue-500 mx-auto"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Web Development -->
+                <div class="bg-gray-900 rounded-xl p-6 card-3d hover:glow transition">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-green-500 bg-opacity-20 p-3 rounded-lg mr-4">
+                            <i class="fas fa-code text-green-400 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Web Development</h3>
+                    </div>
+                    <ul class="space-y-2 text-gray-300">
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-400 mr-2"></i>
+                            HTML5, CSS3, JavaScript
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-400 mr-2"></i>
+                            Tailwind CSS
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-400 mr-2"></i>
+                            Alpine.js & Vue.js
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-400 mr-2"></i>
+                            UI/UX Design
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-400 mr-2"></i>
+                            Laravel Framework
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Cybersecurity -->
+                <div class="bg-gray-900 rounded-xl p-6 card-3d hover:glow transition">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-blue-500 bg-opacity-20 p-3 rounded-lg mr-4">
+                            <i class="fas fa-shield-alt text-blue-400 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Cybersecurity & Systems</h3>
+                    </div>
+                    <ul class="space-y-2 text-gray-300">
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-blue-400 mr-2"></i>
+                            White Hat Fundamentals
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-blue-400 mr-2"></i>
+                            Termux & Linux Command Line
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-blue-400 mr-2"></i>
+                            Simulasi Sistem (Python + Pygame)
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Tools & Soft Skills -->
+                <div class="bg-gray-900 rounded-xl p-6 card-3d hover:glow transition">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-purple-500 bg-opacity-20 p-3 rounded-lg mr-4">
+                            <i class="fas fa-tools text-purple-400 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Tools & Soft Skills</h3>
+                    </div>
+                    <ul class="space-y-2 text-gray-300">
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-purple-400 mr-2"></i>
+                            Git & GitHub
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-purple-400 mr-2"></i>
+                            Figma
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-purple-400 mr-2"></i>
+                            Problem Solving
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-purple-400 mr-2"></i>
+                            Komunikasi Visual
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Skill Bars -->
+            <div class="mt-16 max-w-3xl mx-auto">
+                <h3 class="text-2xl font-bold mb-8 text-center">Skill Proficiency</h3>
+                
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span>HTML/CSS</span>
+                            <span>80%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                            <div class="skill-bar h-2.5 rounded-full" style="width: 80%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span>JavaScript</span>
+                            <span>70%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                            <div class="skill-bar h-2.5 rounded-full" style="width: 70%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span>Tailwind CSS</span>
+                            <span>75%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                            <div class="skill-bar h-2.5 rounded-full" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span>Vue.js/Alpine.js</span>
+                            <span>60%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                            <div class="skill-bar h-2.5 rounded-full" style="width: 60%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span>Laravel</span>
+                            <span>65%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                            <div class="skill-bar h-2.5 rounded-full" style="width: 65%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span>CyberSecurity Basic</span>
+                            <span>60%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                            <div class="skill-bar h-2.5 rounded-full" style="width: 60%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Vision Section -->
+    <section id="vision" class="py-20 relative">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">Personal Vision</span>
+                </h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-green-400 to-blue-500 mx-auto"></div>
+            </div>
+            
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-gray-800 bg-opacity-50 rounded-xl p-8 md:p-12 relative overflow-hidden">
+                    <div class="absolute -top-10 -right-10 opacity-20">
+                        <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_5tkzkblw.json" background="transparent" speed="0.5" style="width: 200px; height: 200px" loop autoplay></lottie-player>
+                    </div>
+                    
+                    <p class="text-lg mb-6">
+                        Saya ingin menjadi bagian dari perubahan—mengintegrasikan teknologi cerdas ke dalam kehidupan sehari-hari dan industri yang belum banyak disentuh oleh digitalisasi, termasuk agribisnis.
+                    </p>
+                    
+                    <div class="flex items-start mb-6">
+                        <div class="bg-green-500 bg-opacity-20 p-3 rounded-lg mr-4 mt-1">
+                            <i class="fas fa-seedling text-green-400 text-xl"></i>
+                        </div>
+                        <p class="text-lg">
+                            Saya percaya pada kekuatan teknologi yang manusiawi: yang tidak hanya efisien, tetapi juga bisa menjangkau, membantu, dan menyelesaikan masalah nyata.
+                        </p>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="bg-blue-500 bg-opacity-20 p-3 rounded-lg mr-4 mt-1">
+                            <i class="fas fa-lightbulb text-blue-400 text-xl"></i>
+                        </div>
+                        <p class="text-lg">
+                            Setiap langkah kecil dalam coding, desain, dan eksperimen saya adalah bagian dari misi besar: membawa solusi, bukan hanya fitur.
+                        </p>
+                    </div>
+                    
+                    <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-gray-900 p-6 rounded-lg hover:glow transition">
+                            <div class="text-green-400 text-4xl mb-4">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <h4 class="font-bold text-lg mb-2">AI Integration</h4>
+                            <p class="text-gray-300">Mengembangkan sistem asistensi cerdas untuk agribisnis modern</p>
+                        </div>
+                        
+                        <div class="bg-gray-900 p-6 rounded-lg hover:glow transition">
+                            <div class="text-blue-400 text-4xl mb-4">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <h4 class="font-bold text-lg mb-2">Security First</h4>
+                            <p class="text-gray-300">Pendekatan keamanan siber dalam setiap solusi teknologi</p>
+                        </div>
+                        
+                        <div class="bg-gray-900 p-6 rounded-lg hover:glow transition">
+                            <div class="text-purple-400 text-4xl mb-4">
+                                <i class="fas fa-tractor"></i>
+                            </div>
+                            <h4 class="font-bold text-lg mb-2">AgriTech</h4>
+                            <p class="text-gray-300">Digitalisasi dan otomatisasi proses pertanian</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-gray-800 bg-opacity-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">Get In Touch</span>
+                </h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-green-400 to-blue-500 mx-auto"></div>
+            </div>
+            
+            <div class="flex flex-col lg:flex-row gap-12">
+                <div class="lg:w-1/2">
+                    <h3 class="text-2xl font-bold mb-6">Contact Information</h3>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="bg-green-500 bg-opacity-20 p-3 rounded-lg mr-4">
+                                <i class="fas fa-envelope text-green-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold">Email</h4>
+                                <a href="mailto:aldiherawan666@gmail.com" class="text-gray-300 hover:text-green-400 transition">aldiherawan666@gmail.com</a>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="bg-blue-500 bg-opacity-20 p-3 rounded-lg mr-4">
+                                <i class="fas fa-phone-alt text-blue-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold">Phone/WhatsApp</h4>
+                                <a href="https://wa.me/6282250329091" class="text-gray-300 hover:text-green-400 transition">+62 822-5032-9091</a>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="bg-purple-500 bg-opacity-20 p-3 rounded-lg mr-4">
+                                <i class="fas fa-map-marker-alt text-purple-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold">Location</h4>
+                                <p class="text-gray-300">Indonesia</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-2xl font-bold mt-12 mb-6">Find Me On</h3>
+                    
+                    <div class="flex flex-wrap gap-4">
+                        <a href="https://www.tiktok.com/@hhhhhalldi?_t=ZS-8wAwLwlJHxh&_r=1" target="_blank" class="bg-gray-900 hover:bg-gray-800 p-4 rounded-lg flex items-center transition">
+                            <i class="fab fa-tiktok text-xl mr-3"></i>
+                            <span>TikTok: @HlwAll</span>
+                        </a>
+                        
+                        <a href="https://www.instagram.com/alhz.15?igsh=YzljYTk1ODg3Zg==" target="_blank" class="bg-gray-900 hover:bg-gray-800 p-4 rounded-lg flex items-center transition">
+                            <i class="fab fa-instagram text-xl mr-3"></i>
+                            <span>Instagram: @alhz.15</span>
+                        </a>
+                        
+                        <a href="https://x.com/AldiCihuy264154" target="_blank" class="bg-gray-900 hover:bg-gray-800 p-4 rounded-lg flex items-center transition">
+                            <i class="fab fa-twitter text-xl mr-3"></i>
+                            <span>X/Twitter: @AldiCihuy264154</span>
+                        </a>
+                        
+                        <a href="https://id.linkedin.com/" target="_blank" class="bg-gray-900 hover:bg-gray-800 p-4 rounded-lg flex items-center transition">
+                            <i class="fab fa-linkedin-in text-xl mr-3"></i>
+                            <span>LinkedIn</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="lg:w-1/2">
+                    <form id="contactForm" action="/send-message" method="POST" class="bg-gray-900 p-8 rounded-xl">
+                        @csrf <!-- Laravel CSRF protection -->
+                        
+                        <div class="mb-6">
+                            <label for="name" class="block mb-2 font-medium">Your Name</label>
+                            <input type="text" id="name" name="name" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-green-400" required>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label for="email" class="block mb-2 font-medium">Your Email</label>
+                            <input type="email" id="email" name="email" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-green-400" required>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label for="subject" class="block mb-2 font-medium">Subject</label>
+                            <input type="text" id="subject" name="subject" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-green-400" required>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label for="message" class="block mb-2 font-medium">Message</label>
+                            <textarea id="message" name="message" rows="5" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-green-400" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="w-full py-3 px-6 bg-gradient-to-r from-green-500 to-blue-600 rounded-lg font-semibold hover:opacity-90 transition">
+                            Send Message
+                        </button>
+                        
+                        <div id="form-message" class="mt-4 hidden p-4 rounded-lg"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="py-8 bg-gray-900">
+        <div class="container mx-auto px-6 text-center">
+            <div class="flex justify-center mb-6">
+                <div class="flex space-x-6">
+                    <a href="https://www.tiktok.com/@hhhhhalldi?_t=ZS-8wAwLwlJHxh&_r=1" target="_blank" class="text-gray-400 hover:text-green-400 transition">
+                        <i class="fab fa-tiktok text-xl"></i>
+                    </a>
+                    <a href="https://www.instagram.com/alhz.15?igsh=YzljYTk1ODg3Zg==" target="_blank" class="text-gray-400 hover:text-green-400 transition">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                    <a href="https://x.com/AldiCihuy264154" target="_blank" class="text-gray-400 hover:text-green-400 transition">
+                        <i class="fab fa-twitter text-xl"></i>
+                    </a>
+                    <a href="https://id.linkedin.com/" target="_blank" class="text-gray-400 hover:text-green-400 transition">
+                        <i class="fab fa-linkedin-in text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <p class="text-gray-400">
+                &copy; <span id="year"></span> Aldi Herawan. All rights reserved.
+            </p>
+        </div>
+    </footer>
+    
+    <!-- 3D Scene Container -->
+    <div id="3d-container" class="fixed bottom-4 right-4 z-50 w-64 h-64 hidden md:block"></div>
+    
+    <script>
+        // Mobile menu toggle
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+        
+        // Current year for footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+        
+        // Create floating leaves
+        function createLeaves() {
+            const container = document.getElementById('leaves-container');
+            const leafCount = 15;
+            
+            for (let i = 0; i < leafCount; i++) {
+                const leaf = document.createElement('div');
+                leaf.classList.add('leaf');
+                
+                // Random position
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                
+                // Random size
+                const size = Math.random() * 20 + 10;
+                
+                // Random animation duration
+                const duration = Math.random() * 5 + 3;
+                
+                // Random delay
+                const delay = Math.random() * 5;
+                
+                leaf.style.left = `${left}%`;
+                leaf.style.top = `${top}%`;
+                leaf.style.width = `${size}px`;
+                leaf.style.height = `${size}px`;
+                leaf.style.animationDuration = `${duration}s`;
+                leaf.style.animationDelay = `${delay}s`;
+                
+                container.appendChild(leaf);
+            }
+        }
+        
+        // Initialize Vanta.js background
+        VANTA.NET({
+            el: "#vanta-bg",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x3b82f6,
+            backgroundColor: 0x111827,
+            points: 12.00,
+            maxDistance: 22.00,
+            spacing: 18.00
+        });
+        
+        // Form submission with Laravel AJAX
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            const messageDiv = document.getElementById('form-message');
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                messageDiv.classList.remove('hidden');
+                if (data.success) {
+                    messageDiv.textContent = 'Thank you for your message! I will get back to you soon.';
+                    messageDiv.classList.add('bg-green-500', 'bg-opacity-20', 'text-green-400');
+                    form.reset();
+                } else {
+                    messageDiv.textContent = 'There was an error sending your message. Please try again.';
+                    messageDiv.classList.add('bg-red-500', 'bg-opacity-20', 'text-red-400');
+                }
+                
+                // Hide message after 5 seconds
+                setTimeout(() => {
+                    messageDiv.classList.add('hidden');
+                    messageDiv.classList.remove('bg-green-500', 'bg-opacity-20', 'text-green-400', 'bg-red-500', 'text-red-400');
+                }, 5000);
+            })
+            .catch(error => {
+                messageDiv.classList.remove('hidden');
+                messageDiv.textContent = 'There was an error sending your message. Please try again.';
+                messageDiv.classList.add('bg-red-500', 'bg-opacity-20', 'text-red-400');
+                
+                setTimeout(() => {
+                    messageDiv.classList.add('hidden');
+                    messageDiv.classList.remove('bg-red-500', 'bg-opacity-20', 'text-red-400');
+                }, 5000);
+            });
+        });
+        
+        // Initialize 3D scene
+        function init3DScene() {
+            const container = document.getElementById('3d-container');
+            if (!container) return;
+            
+            // Scene setup
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(256, 256);
+            container.appendChild(renderer.domElement);
+            
+            // Add a cube with tech/agriculture texture
+            const geometry = new THREE.BoxGeometry(3, 3, 3);
+            
+            // Create a texture that combines tech and agriculture
+            const loader = new THREE.TextureLoader();
+            const materials = [
+                new THREE.MeshBasicMaterial({ color: 0x4ade80 }), // green - agriculture
+                new THREE.MeshBasicMaterial({ color: 0x3b82f6 }), // blue - tech
+                new THREE.MeshBasicMaterial({ color: 0x4ade80 }), // green
+                new THREE.MeshBasicMaterial({ color: 0x3b82f6 }), // blue
+                new THREE.MeshBasicMaterial({ 
+                    map: loader.load('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%233b82f6"/><path d="M20,20 L80,20 L80,80 L20,80 Z" fill="%234ade80"/><circle cx="50" cy="50" r="20" fill="%233b82f6"/></svg>')
+                }), // combined
+                new THREE.MeshBasicMaterial({ 
+                    map: loader.load('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%234ade80"/><path d="M10,10 L90,10 L90,90 L10,90 Z" fill="%233b82f6"/><path d="M30,30 L70,30 L70,70 L30,70 Z" fill="%234ade80"/></svg>')
+                }), // combined
+            ];
+            
+            const cube = new THREE.Mesh(geometry, materials);
+            scene.add(cube);
+            
+            // Add lights
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
+            
+            camera.position.z = 5;
+            
+            // Add controls
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableZoom = false;
+            controls.enablePan = false;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 1;
+            
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+            
+            // Make it interactive
+            container.addEventListener('mouseenter', () => {
+                controls.autoRotate = false;
+            });
+            
+            container.addEventListener('mouseleave', () => {
+                controls.autoRotate = true;
+            });
+        }
+        
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            createLeaves();
+            init3DScene();
+            
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                        
+                        // Close mobile menu if open
+                        const mobileMenu = document.getElementById('mobile-menu');
+                        if (!mobileMenu.classList.contains('hidden')) {
+                            mobileMenu.classList.add('hidden');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
